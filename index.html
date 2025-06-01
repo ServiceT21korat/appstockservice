@@ -1,0 +1,552 @@
+	
+	<!DOCTYPE html>
+	<html lang="th">
+	<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ระบบเบิกวัสดุ</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<style>
+	@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+	
+	body {
+	font-family: 'Prompt', sans-serif;
+	}
+	
+	.loader {
+	border-top-color: #3B82F6;
+	-webkit-animation: spinner 1.5s linear infinite;
+	animation: spinner 1.5s linear infinite;
+	}
+	
+	@-webkit-keyframes spinner {
+	0% { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(360deg); }
+	}
+	
+	@keyframes spinner {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+	}
+	
+	.fade-in {
+	animation: fadeIn 0.5s ease-in-out;
+	}
+	
+	@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+	}
+	
+	.slide-in {
+	animation: slideIn 0.3s ease-in-out;
+	}
+	
+	@keyframes slideIn {
+	from { transform: translateY(20px); opacity: 0; }
+	to { transform: translateY(0); opacity: 1; }
+	}
+	</style>
+	</head>
+	<body class="bg-gray-50">
+	<div class="min-h-screen flex flex-col">
+	<!-- Header -->
+	<header class="bg-blue-700 text-white shadow-lg">
+	<div class="container mx-auto px-4 py-4 flex justify-between items-center">
+	<div class="flex items-center space-x-2">
+	<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0v10l-8 4m-8-4V7m8 4v10M4 7v10l8 4" />
+	</svg>
+	<h1 class="text-xl md:text-2xl font-bold">ระบบเบิกวัสดุ</h1>
+	</div>
+	<div class="flex items-center">
+	<span id="currentDate" class="text-sm md:text-base"></span>
+	</div>
+	</div>
+	</header>
+	
+	<!-- Main Content -->
+	<main class="flex-grow container mx-auto px-4 py-6">
+	<!-- Low Stock Alert -->
+	<div class="mb-8 bg-white rounded-xl shadow-md p-6 fade-in">
+	<h2 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+	<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+	</svg>
+	วัสดุที่มีจำนวนคงเหลือน้อย (≤ 10)
+	</h2>
+	<div class="overflow-x-auto">
+	<table class="min-w-full divide-y divide-gray-200">
+	<thead class="bg-blue-50">
+	<tr>
+	<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">รหัสวัสดุ</th>
+	<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">ชื่อวัสดุ</th>
+	<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">จำนวนคงเหลือ</th>
+	<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">เบิก</th>
+	</tr>
+	</thead>
+	<tbody id="lowStockTable" class="bg-white divide-y divide-gray-200">
+	<!-- Low stock items will be populated here -->
+	<tr>
+	<td colspan="4" class="px-6 py-4 text-center text-gray-500">กำลังโหลดข้อมูล...</td>
+	</tr>
+	</tbody>
+	</table>
+	</div>
+	</div>
+	
+	<!-- Requisition Form -->
+	<div class="bg-white rounded-xl shadow-md p-6 fade-in">
+	<h2 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+	<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+	</svg>
+	เบิกวัสดุ
+	</h2>
+	<form id="requisitionForm" class="space-y-4">
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	<div>
+	<label for="materialCode" class="block text-sm font-medium text-gray-700 mb-1">รหัสวัสดุ</label>
+	<div class="relative">
+	<input type="text" id="materialCode" name="materialCode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="กรอกรหัสวัสดุ" required>
+	<button type="button" id="searchBtn" class="absolute right-2 top-2 text-blue-600 hover:text-blue-800">
+	<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+	</svg>
+	</button>
+	</div>
+	</div>
+	<div>
+	<label for="materialName" class="block text-sm font-medium text-gray-700 mb-1">ชื่อวัสดุ</label>
+	<input type="text" id="materialName" name="materialName" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50" readonly>
+	</div>
+	</div>
+	<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+	<div>
+	<label for="stockQuantity" class="block text-sm font-medium text-gray-700 mb-1">จำนวนในสต๊อก</label>
+	<input type="number" id="stockQuantity" name="stockQuantity" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50" readonly>
+	</div>
+	<div>
+	<label for="requestQuantity" class="block text-sm font-medium text-gray-700 mb-1">จำนวนที่เบิก</label>
+	<input type="number" id="requestQuantity" name="requestQuantity" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+	</div>
+	<div>
+	<label for="remainingQuantity" class="block text-sm font-medium text-gray-700 mb-1">จำนวนคงเหลือ</label>
+	<input type="number" id="remainingQuantity" name="remainingQuantity" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50" readonly>
+	</div>
+	</div>
+	<div class="pt-2">
+	<button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center" disabled>
+	<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+	</svg>
+	บันทึกการเบิก
+	</button>
+	</div>
+	</form>
+	</div>
+	
+	<!-- Recent Transactions -->
+	<div class="mt-8 bg-white rounded-xl shadow-md p-6 fade-in">
+	<h2 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+	<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+	</svg>
+	รายการเบิกล่าสุด
+	</h2>
+	<div class="overflow-x-auto">
+	<table class="min-w-full divide-y divide-gray-200">
+	<thead class="bg-blue-50">
+	<tr>
+	<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">วันที่</th>
+	<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">รหัสวัสดุ</th>
+	<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">ชื่อวัสดุ</th>
+	<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">จำนวนที่เบิก</th>
+	</tr>
+	</thead>
+	<tbody id="recentTransactionsTable" class="bg-white divide-y divide-gray-200">
+	<!-- Recent transactions will be populated here -->
+	<tr>
+	<td colspan="4" class="px-6 py-4 text-center text-gray-500">ไม่มีรายการเบิกล่าสุด</td>
+	</tr>
+	</tbody>
+	</table>
+	</div>
+	</div>
+	</main>
+	
+	<!-- Footer -->
+	<footer class="bg-blue-800 text-white py-4 mt-8">
+	<div class="container mx-auto px-4 text-center text-sm">
+	<p>© 2023 ระบบเบิกวัสดุ - พัฒนาโดย Canva Code</p>
+	</div>
+	</footer>
+	</div>
+	
+	<!-- Modal -->
+	<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+	<div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+	<div id="modalContent" class="text-center">
+	<!-- Modal content will be inserted here -->
+	</div>
+	<div class="mt-6 flex justify-center">
+	<button id="closeModalBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+	ตกลง
+	</button>
+	</div>
+	</div>
+	</div>
+	
+	<script>
+	// Sample data for demonstration - this would be replaced with actual data from Google Sheets
+	const materialData = [
+	{ materialCode: "M001", materialName: "กระดาษ A4", stockQuantity: 8 },
+	{ materialCode: "M002", materialName: "ปากกาลูกลื่น", stockQuantity: 15 },
+	{ materialCode: "M003", materialName: "ดินสอ 2B", stockQuantity: 5 },
+	{ materialCode: "M004", materialName: "ยางลบ", stockQuantity: 10 },
+	{ materialCode: "M005", materialName: "ลวดเย็บกระดาษ", stockQuantity: 3 },
+	{ materialCode: "M006", materialName: "คลิปหนีบกระดาษ", stockQuantity: 20 },
+	{ materialCode: "M007", materialName: "แฟ้มเอกสาร", stockQuantity: 7 },
+	{ materialCode: "M008", materialName: "เทปกาว", stockQuantity: 9 },
+	{ materialCode: "M009", materialName: "กรรไกร", stockQuantity: 12 },
+	{ materialCode: "M010", materialName: "คัตเตอร์", stockQuantity: 6 },
+	{ materialCode: "M011", materialName: "สมุดโน้ต", stockQuantity: 25 },
+	{ materialCode: "M012", materialName: "กระดาษโน้ต", stockQuantity: 18 },
+	{ materialCode: "M013", materialName: "แฟ้มซอง", stockQuantity: 4 },
+	{ materialCode: "M014", materialName: "ที่เจาะกระดาษ", stockQuantity: 8 },
+	{ materialCode: "M015", materialName: "ที่เย็บกระดาษ", stockQuantity: 14 },
+	{ materialCode: "M016", materialName: "ปากกาเน้นข้อความ", stockQuantity: 9 },
+	{ materialCode: "M017", materialName: "กระดาษการ์ด", stockQuantity: 30 },
+	{ materialCode: "M018", materialName: "ซองจดหมาย", stockQuantity: 50 },
+	{ materialCode: "M019", materialName: "ไม้บรรทัด", stockQuantity: 7 },
+	{ materialCode: "M020", materialName: "น้ำยาลบคำผิด", stockQuantity: 2 }
+	];
+	
+	// Sample recent transactions
+	const recentTransactions = [];
+	
+	document.addEventListener('DOMContentLoaded', function() {
+	// Initialize variables
+	const materialCodeInput = document.getElementById('materialCode');
+	const materialNameInput = document.getElementById('materialName');
+	const stockQuantityInput = document.getElementById('stockQuantity');
+	const requestQuantityInput = document.getElementById('requestQuantity');
+	const remainingQuantityInput = document.getElementById('remainingQuantity');
+	const searchBtn = document.getElementById('searchBtn');
+	const requisitionForm = document.getElementById('requisitionForm');
+	const submitBtn = document.getElementById('submitBtn');
+	const modal = document.getElementById('modal');
+	const modalContent = document.getElementById('modalContent');
+	const closeModalBtn = document.getElementById('closeModalBtn');
+	const lowStockTable = document.getElementById('lowStockTable');
+	const recentTransactionsTable = document.getElementById('recentTransactionsTable');
+	const currentDateElement = document.getElementById('currentDate');
+	
+	let currentMaterial = null;
+	
+	// Set current date
+	const today = new Date();
+	const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+	currentDateElement.textContent = today.toLocaleDateString('th-TH', options);
+	
+	// Populate low stock table
+	function populateLowStockTable() {
+	lowStockTable.innerHTML = '';
+	const lowStockItems = materialData
+	.filter(item => item.stockQuantity <= 10)
+	.sort((a, b) => a.stockQuantity - b.stockQuantity)
+	.slice(0, 5); // Only show top 5 lowest stock items
+	
+	if (lowStockItems.length === 0) {
+	const emptyRow = document.createElement('tr');
+	emptyRow.innerHTML = `
+	<td colspan="4" class="px-6 py-4 text-center text-gray-500">ไม่พบวัสดุที่มีจำนวนคงเหลือน้อย</td>
+	`;
+	lowStockTable.appendChild(emptyRow);
+	return;
+	}
+	
+	lowStockItems.forEach(item => {
+	const row = document.createElement('tr');
+	row.className = 'hover:bg-blue-50';
+	row.innerHTML = `
+	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.materialCode}</td>
+	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.materialName}</td>
+	<td class="px-6 py-4 whitespace-nowrap text-sm ${item.stockQuantity <= 5 ? 'text-red-600 font-medium' : 'text-gray-900'}">${item.stockQuantity}</td>
+	<td class="px-6 py-4 whitespace-nowrap text-sm">
+	<button class="requisition-btn bg-blue-100 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-200 transition duration-300" 
+	data-code="${item.materialCode}">
+	เบิก
+	</button>
+	</td>
+	`;
+	lowStockTable.appendChild(row);
+	});
+	
+	// Add event listeners to requisition buttons
+	document.querySelectorAll('.requisition-btn').forEach(btn => {
+	btn.addEventListener('click', function() {
+	const code = this.getAttribute('data-code');
+	materialCodeInput.value = code;
+	searchMaterial(code);
+	// Scroll to form
+	document.getElementById('requisitionForm').scrollIntoView({ behavior: 'smooth' });
+	});
+	});
+	}
+	
+	// Populate recent transactions table
+	function populateRecentTransactionsTable() {
+	recentTransactionsTable.innerHTML = '';
+	
+	if (recentTransactions.length === 0) {
+	const emptyRow = document.createElement('tr');
+	emptyRow.innerHTML = `
+	<td colspan="4" class="px-6 py-4 text-center text-gray-500">ไม่มีรายการเบิกล่าสุด</td>
+	`;
+	recentTransactionsTable.appendChild(emptyRow);
+	return;
+	}
+	
+	// Show only the 5 most recent transactions
+	const recentItems = recentTransactions.slice(0, 5);
+	
+	recentItems.forEach(item => {
+	const row = document.createElement('tr');
+	row.className = 'hover:bg-blue-50';
+	row.innerHTML = `
+	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.date}</td>
+	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.materialCode}</td>
+	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.materialName}</td>
+	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.requestQuantity}</td>
+	`;
+	recentTransactionsTable.appendChild(row);
+	});
+	}
+	
+	// Search for material by code
+	function searchMaterial(code) {
+	const material = materialData.find(item => item.materialCode === code);
+	
+	if (material) {
+	currentMaterial = material;
+	materialNameInput.value = material.materialName;
+	stockQuantityInput.value = material.stockQuantity;
+	requestQuantityInput.value = 1;
+	calculateRemaining();
+	requestQuantityInput.focus();
+	submitBtn.disabled = false;
+	submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+	} else {
+	currentMaterial = null;
+	materialNameInput.value = '';
+	stockQuantityInput.value = '';
+	requestQuantityInput.value = '';
+	remainingQuantityInput.value = '';
+	submitBtn.disabled = true;
+	submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+	showModal('ไม่พบข้อมูลวัสดุ กรุณาตรวจสอบรหัสวัสดุอีกครั้ง');
+	}
+	}
+	
+	// Calculate remaining quantity
+	function calculateRemaining() {
+	if (currentMaterial && requestQuantityInput.value) {
+	const requestQty = parseInt(requestQuantityInput.value);
+	const stockQty = currentMaterial.stockQuantity;
+	const remaining = stockQty - requestQty;
+	remainingQuantityInput.value = remaining;
+	
+	// Validate request quantity
+	if (requestQty <= 0) {
+	remainingQuantityInput.classList.add('bg-red-50');
+	submitBtn.disabled = true;
+	submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+	} else if (remaining < 0) {
+	remainingQuantityInput.classList.add('bg-red-50');
+	submitBtn.disabled = true;
+	submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+	} else {
+	remainingQuantityInput.classList.remove('bg-red-50');
+	submitBtn.disabled = false;
+	submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+	}
+	} else {
+	remainingQuantityInput.value = '';
+	}
+	}
+	
+	// Show modal with message
+	function showModal(message, isSuccess = false) {
+	modalContent.innerHTML = `
+	<div class="flex flex-col items-center">
+	<div class="w-16 h-16 mb-4 flex items-center justify-center rounded-full ${isSuccess ? 'bg-green-100' : 'bg-blue-100'}">
+	${isSuccess ? 
+	'<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>' :
+	'<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
+	}
+	</div>
+	<p class="text-lg font-medium ${isSuccess ? 'text-green-800' : 'text-gray-800'}">${message}</p>
+	</div>
+	`;
+	modal.classList.remove('hidden');
+	}
+	
+	// Show loading indicator in modal
+	function showLoading(message = 'กำลังดำเนินการ...') {
+	modalContent.innerHTML = `
+	<div class="flex flex-col items-center">
+	<div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+	<p class="text-lg font-medium text-gray-800">${message}</p>
+	</div>
+	`;
+	modal.classList.remove('hidden');
+	}
+	
+	// Format date for display
+	function formatDate(date) {
+	const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+	return date.toLocaleDateString('th-TH', options);
+	}
+	
+	// Submit form to Google Sheets
+	function submitToGoogleSheets(formData) {
+	showLoading('กำลังบันทึกข้อมูล...');
+	
+	// In a real implementation, this would be an actual fetch to the Google Apps Script
+	// For demo purposes, we'll simulate the API call
+	setTimeout(() => {
+	// Update local data to reflect the change
+	if (currentMaterial) {
+	const requestQty = parseInt(requestQuantityInput.value);
+	currentMaterial.stockQuantity = parseInt(remainingQuantityInput.value);
+	
+	// Add to recent transactions
+	recentTransactions.unshift({
+	date: formatDate(new Date()),
+	materialCode: currentMaterial.materialCode,
+	materialName: currentMaterial.materialName,
+	requestQuantity: requestQty
+	});
+	
+	populateLowStockTable(); // Refresh the low stock table
+	populateRecentTransactionsTable(); // Refresh recent transactions
+	}
+	
+	showModal('บันทึกข้อมูลการเบิกวัสดุเรียบร้อยแล้ว', true);
+	
+	// Reset form
+	requisitionForm.reset();
+	currentMaterial = null;
+	submitBtn.disabled = true;
+	submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+	}, 1500);
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	 This would be the actual implementation:
+	fetch('https://script.google.com/macros/s/AKfycbw6mZkoxMsNdZq9crhSkpb_JmTywUox1H7SPTJKqBxxjEHk1GPkNlUpaw9FfPpc5uPxKA/exec', {
+	method: 'POST',
+	body: formData
+	})
+	.then(response => response.json())
+	.then(data => {
+	if (data.result === 'success') {
+	// Update local data
+	if (currentMaterial) {
+	const requestQty = parseInt(requestQuantityInput.value);
+	currentMaterial.stockQuantity = parseInt(remainingQuantityInput.value);
+	
+	// Add to recent transactions
+	recentTransactions.unshift({
+	date: formatDate(new Date()),
+	materialCode: currentMaterial.materialCode,
+	materialName: currentMaterial.materialName,
+	requestQuantity: requestQty
+	});
+	
+	populateLowStockTable();
+	populateRecentTransactionsTable();
+	}
+	showModal('บันทึกข้อมูลการเบิกวัสดุเรียบร้อยแล้ว', true);
+	requisitionForm.reset();
+	currentMaterial = null;
+	submitBtn.disabled = true;
+	submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+	} else {
+	showModal('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + data.error);
+	}
+	})
+	.catch(error => {
+	showModal('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error.message);
+	});
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	}
+	
+	// Event Listeners
+	searchBtn.addEventListener('click', function() {
+	const code = materialCodeInput.value.trim();
+	if (code) {
+	searchMaterial(code);
+	} else {
+	showModal('กรุณากรอกรหัสวัสดุ');
+	}
+	});
+	
+	materialCodeInput.addEventListener('keypress', function(e) {
+	if (e.key === 'Enter') {
+	e.preventDefault();
+	const code = this.value.trim();
+	if (code) {
+	searchMaterial(code);
+	} else {
+	showModal('กรุณากรอกรหัสวัสดุ');
+	}
+	}
+	});
+	
+	requestQuantityInput.addEventListener('input', calculateRemaining);
+	
+	requisitionForm.addEventListener('submit', function(e) {
+	e.preventDefault();
+	
+	if (!currentMaterial) {
+	showModal('กรุณาค้นหาวัสดุก่อนทำการเบิก');
+	return;
+	}
+	
+	const requestQty = parseInt(requestQuantityInput.value);
+	if (isNaN(requestQty) || requestQty <= 0) {
+	showModal('กรุณาระบุจำนวนที่ต้องการเบิกให้ถูกต้อง');
+	return;
+	}
+	
+	if (requestQty > currentMaterial.stockQuantity) {
+	showModal('จำนวนที่เบิกมากกว่าจำนวนในสต๊อก');
+	return;
+	}
+	
+	// Prepare form data for submission
+	const formData = new FormData();
+	formData.append('materialCode', currentMaterial.materialCode);
+	formData.append('materialName', currentMaterial.materialName);
+	formData.append('stockQuantity', currentMaterial.stockQuantity);
+	formData.append('requestQuantity', requestQty);
+	formData.append('remainingQuantity', parseInt(remainingQuantityInput.value));
+	
+	submitToGoogleSheets(formData);
+	});
+	
+	closeModalBtn.addEventListener('click', function() {
+	modal.classList.add('hidden');
+	});
+	
+	// Initialize the page
+	populateLowStockTable();
+	populateRecentTransactionsTable();
+	});
+	</script>
+	<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'948bc3cdd397a1c8',t:'MTc0ODc1MDAxNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+	</html>
+	
+
