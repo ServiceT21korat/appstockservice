@@ -4,7 +4,7 @@
 function doPost(e) {
   try {
     // Open the spreadsheet using the provided ID
-    const ss = SpreadsheetApp.openById('1ZjLX7Rwbsn9MC6PkJLvx0qE-3DylsxHAfXOPRYjcFqU');
+    const ss = SpreadsheetApp.openById('14XwCMLNYYllVSRdl1jqzU48H2ilFbAFgFuhbtuKHLbc');
     
     // Get the StockData sheet for recording transactions
     const stockDataSheet = ss.getSheetByName('StockData');
@@ -55,7 +55,7 @@ function doPost(e) {
 // Function to update inventory stock quantity
 function updateInventory(materialCode, newQuantity) {
   try {
-    const ss = SpreadsheetApp.openById('1ZjLX7Rwbsn9MC6PkJLvx0qE-3DylsxHAfXOPRYjcFqU');
+    const ss = SpreadsheetApp.openById('14XwCMLNYYllVSRdl1jqzU48H2ilFbAFgFuhbtuKHLbc');
     
     // Get or create the Inventory sheet
     let inventorySheet = ss.getSheetByName('Inventory');
@@ -131,7 +131,7 @@ function doGet(e) {
 
 // Get all inventory items
 function getAllInventory() {
-  const ss = SpreadsheetApp.openById('1ZjLX7Rwbsn9MC6PkJLvx0qE-3DylsxHAfXOPRYjcFqU');
+  const ss = SpreadsheetApp.openById('14XwCMLNYYllVSRdl1jqzU48H2ilFbAFgFuhbtuKHLbc');
   
   // Get or create the Inventory sheet
   let inventorySheet = ss.getSheetByName('Inventory');
@@ -169,7 +169,7 @@ function getLowStockItems() {
 
 // Get recent transactions
 function getRecentTransactions() {
-  const ss = SpreadsheetApp.openById('1ZjLX7Rwbsn9MC6PkJLvx0qE-3DylsxHAfXOPRYjcFqU');
+  const ss = SpreadsheetApp.openById('14XwCMLNYYllVSRdl1jqzU48H2ilFbAFgFuhbtuKHLbc');
   
   // Get the StockData sheet
   const stockDataSheet = ss.getSheetByName('StockData');
@@ -205,7 +205,7 @@ function searchMaterial(code) {
 
 // Function to initialize the inventory data with sample items
 function initializeInventoryData() {
-  const ss = SpreadsheetApp.openById('1ZjLX7Rwbsn9MC6PkJLvx0qE-3DylsxHAfXOPRYjcFqU');
+  const ss = SpreadsheetApp.openById('14XwCMLNYYllVSRdl1jqzU48H2ilFbAFgFuhbtuKHLbc');
   
   // Create Inventory sheet if it doesn't exist
   let inventorySheet = ss.getSheetByName('Inventory');
@@ -274,7 +274,7 @@ function initializeInventoryData() {
 
 // Function to reset all data (for testing purposes)
 function resetAllData() {
-  const ss = SpreadsheetApp.openById('1ZjLX7Rwbsn9MC6PkJLvx0qE-3DylsxHAfXOPRYjcFqU');
+  const ss = SpreadsheetApp.openById('14XwCMLNYYllVSRdl1jqzU48H2ilFbAFgFuhbtuKHLbc');
   
   // Delete existing sheets
   const inventorySheet = ss.getSheetByName('Inventory');
