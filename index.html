@@ -412,36 +412,39 @@
 	
 	// Submit form to Google Sheets
 /////////////////////////////////////////////////////		
+//function submitToGoogleSheets(formData) {
+//  showLoading('กำลังบันทึกข้อมูล...');
+ // fetch('https://script.google.com/macros/s/AKfycbw6mZkoxMsNdZq9crhSkpb_JmTywUox1H7SPTJKqBxxjEHk1GPkNlUpaw9FfPpc5uPxKA/exec', {
+ //   method: 'POST',
+  //  body: formData
+ // })
+//  .then(response => response.json())
+  //.then(data => {
+  //  if (data.result === 'success') {
+      ////// อัปเดตข้อมูลในหน้าเว็บ (ตามที่เคยเขียนไว้)
+  //    showModal('บันทึกข้อมูลการเบิกวัสดุเรียบร้อยแล้ว', true);
+  //    requisitionForm.reset();
+  //    currentMaterial = null;
+  //    submitBtn.disabled = true;
+   //   submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+   //   populateLowStockTable();
+    //  populateRecentTransactionsTable();
+    //} else {
+    //  showModal('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + data.error);
+   // }
+ // })
+ // .catch(error => {
+ //   showModal('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error.message);
+ // });
+//}
+///////////////////////////////////////////////////////
+
 function submitToGoogleSheets(formData) {
   showLoading('กำลังบันทึกข้อมูล...');
   fetch('https://script.google.com/macros/s/AKfycbw6mZkoxMsNdZq9crhSkpb_JmTywUox1H7SPTJKqBxxjEHk1GPkNlUpaw9FfPpc5uPxKA/exec', {
-    method: 'POST',
-    body: formData
+	 method: 'POST',
+   body: formData
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.result === 'success') {
-      // อัปเดตข้อมูลในหน้าเว็บ (ตามที่เคยเขียนไว้)
-      showModal('บันทึกข้อมูลการเบิกวัสดุเรียบร้อยแล้ว', true);
-      requisitionForm.reset();
-      currentMaterial = null;
-      submitBtn.disabled = true;
-      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-      populateLowStockTable();
-      populateRecentTransactionsTable();
-    } else {
-      showModal('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + data.error);
-    }
-  })
-  .catch(error => {
-    showModal('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error.message);
-  });
-}
-///////////////////////////////////////////////////////
-/*
-function submitToGoogleSheets(formData) {
-	showLoading('กำลังบันทึกข้อมูล...');
-	
 	// In a real implementation, this would be an actual fetch to the Google Apps Script
 	// For demo purposes, we'll simulate the API call
 	setTimeout(() => {
