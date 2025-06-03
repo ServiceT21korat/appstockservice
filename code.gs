@@ -1,6 +1,7 @@
 // Code.gs - Google Apps Script for Material Requisition System
-/////////////////ส่วนที่เพิ่มใหม่3/6/68//////////////////////////
-function doGet(e) {
+
+/////////////////ส่วนที่เพิ่มใหม่3/6/68///////////////////////////
+/*function doGet(e) {
   // เปลี่ยนชื่อชีทตรงนี้ถ้าไม่ใช่ Sheet1
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Inventory'); 
   var data = sheet.getDataRange().getValues();
@@ -15,8 +16,10 @@ function doGet(e) {
     });
   }
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
-}
+}*/
 ///////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////
 // Set up web app to handle POST requests from the form
 function doPost(e) {
   try {
@@ -87,7 +90,7 @@ function updateInventory(materialCode, newQuantity) {
     for (let i = 1; i < data.length; i++) {  // Start from 1 to skip header row
       if (data[i][0] === materialCode) {  // Assuming material code is in column A (index 0)
         // Update the stock quantity (assuming it's in column C (index 2))
-        inventorySheet.getRange(i + 1, 2).setValue(newQuantity);
+        inventorySheet.getRange(i + 1, 3).setValue(newQuantity);
         break;
       }
     }
@@ -246,7 +249,10 @@ function initializeInventoryData() {
   if (inventorySheet.getLastRow() > 1) {
     inventorySheet.deleteRows(2, inventorySheet.getLastRow() - 1);
   }
-  
+
+
+  let materialData = []; // ประกาศตัวแปรเปล่าไว้
+  /*
   // Sample data - 20 items as requested
   const sampleData = [
     { materialCode: "M001", materialName: "กระดาษ A4", stockQuantity: 8 },
@@ -270,7 +276,7 @@ function initializeInventoryData() {
     { materialCode: "M019", materialName: "ไม้บรรทัด", stockQuantity: 7 },
     { materialCode: "M020", materialName: "น้ำยาลบคำผิด", stockQuantity: 2 }
   ];
-  
+  */
   // Add sample data
   sampleData.forEach(item => {
     inventorySheet.appendRow([
