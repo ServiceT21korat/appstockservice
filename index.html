@@ -200,22 +200,32 @@
 	
 	<script>
 	// Sample data for demonstration - this would be replaced with actual data from Google Sheets
-	let materialData = [];
-  function fetchMaterialData() {
-  fetch('https://script.google.com/macros/s/AKfycbw6mZkoxMsNdZq9crhSkpb_JmTywUox1H7SPTJKqBxxjEHk1GPkNlUpaw9FfPpc5uPxKA/exec')
-    .then(response => response.json())
-    .then(data => {
-      materialData = data;
-      populateLowStockTable(); // โหลดตารางวัสดุคงเหลือน้อย
-    })
-    .catch(() => {
-      showModal('ไม่สามารถโหลดรายการวัสดุจาก Google Sheets ได้');
-    });
-}
+	const materialData = [
+	{ materialCode: "M001", materialName: "กระดาษ A4", stockQuantity: 8 },
+	{ materialCode: "M002", materialName: "ปากกาลูกลื่น", stockQuantity: 15 },
+	{ materialCode: "M003", materialName: "ดินสอ 2B", stockQuantity: 5 },
+	{ materialCode: "M004", materialName: "ยางลบ", stockQuantity: 10 },
+	{ materialCode: "M005", materialName: "ลวดเย็บกระดาษ", stockQuantity: 3 },
+	{ materialCode: "M006", materialName: "คลิปหนีบกระดาษ", stockQuantity: 20 },
+	{ materialCode: "M007", materialName: "แฟ้มเอกสาร", stockQuantity: 7 },
+	{ materialCode: "M008", materialName: "เทปกาว", stockQuantity: 9 },
+	{ materialCode: "M009", materialName: "กรรไกร", stockQuantity: 12 },
+	{ materialCode: "M010", materialName: "คัตเตอร์", stockQuantity: 6 },
+	{ materialCode: "M011", materialName: "สมุดโน้ต", stockQuantity: 25 },
+	{ materialCode: "M012", materialName: "กระดาษโน้ต", stockQuantity: 18 },
+	{ materialCode: "M013", materialName: "แฟ้มซอง", stockQuantity: 4 },
+	{ materialCode: "M014", materialName: "ที่เจาะกระดาษ", stockQuantity: 8 },
+	{ materialCode: "M015", materialName: "ที่เย็บกระดาษ", stockQuantity: 14 },
+	{ materialCode: "M016", materialName: "ปากกาเน้นข้อความ", stockQuantity: 9 },
+	{ materialCode: "M017", materialName: "กระดาษการ์ด", stockQuantity: 30 },
+	{ materialCode: "M018", materialName: "ซองจดหมาย", stockQuantity: 50 },
+	{ materialCode: "M019", materialName: "ไม้บรรทัด", stockQuantity: 7 },
+	{ materialCode: "M020", materialName: "น้ำยาลบคำผิด", stockQuantity: 2 }
+	];
 	
 	// Sample recent transactions
 	const recentTransactions = [];
-	/*
+	
 	document.addEventListener('DOMContentLoaded', function() {
 	// Initialize variables
 	const materialCodeInput = document.getElementById('materialCode');
@@ -234,7 +244,7 @@
 	const currentDateElement = document.getElementById('currentDate');
 	
 	let currentMaterial = null;
-	*/
+	
 	// Set current date
 	const today = new Date();
 	const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -417,10 +427,8 @@ function submitToGoogleSheets(formData) {
       currentMaterial = null;
       submitBtn.disabled = true;
       submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-      ////////////////////////////////////////////////////////////////////
-      fetchMaterialData(); // โหลดข้อมูลจาก Google Sheets
+      populateLowStockTable();
       populateRecentTransactionsTable();
-      ///////////////////////////////////////////////////////////////
     } else {
       showModal('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + data.error);
     }
@@ -450,11 +458,11 @@ function submitToGoogleSheets(formData) {
 	materialName: currentMaterial.materialName,
 	requestQuantity: requestQty
 	});
-	///////////////////////////////////////////////////////////////////
-	fetchMaterialData(); // โหลดข้อมูลจาก Google Sheets
-  populateRecentTransactionsTable();
+	
+	populateLowStockTable(); // Refresh the low stock table
+	populateRecentTransactionsTable(); // Refresh recent transactions
 	}
-	//////////////////////////////////////////////////////////////////
+	
 	showModal('บันทึกข้อมูลการเบิกวัสดุเรียบร้อยแล้ว', true);
 	
 	// Reset form
@@ -485,10 +493,9 @@ function submitToGoogleSheets(formData) {
 	materialName: currentMaterial.materialName,
 	requestQuantity: requestQty
 	});
-	////////////////////////////////////////////////////////////////
-	fetchMaterialData(); // โหลดข้อมูลจาก Google Sheets
-  populateRecentTransactionsTable();
-  //////////////////////////////////////////////////////////////////
+	
+	populateLowStockTable();
+	populateRecentTransactionsTable();
 	}
 	showModal('บันทึกข้อมูลการเบิกวัสดุเรียบร้อยแล้ว', true);
 	requisitionForm.reset();
@@ -564,8 +571,8 @@ function submitToGoogleSheets(formData) {
 	});
 	
 	// Initialize the page
-fetchMaterialData(); // โหลดข้อมูลจาก Google Sheets
-populateRecentTransactionsTable();
+	populateLowStockTable();
+	populateRecentTransactionsTable();
 	});
 	</script>
 	<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'948bc3cdd397a1c8',t:'MTc0ODc1MDAxNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
