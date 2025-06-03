@@ -199,8 +199,26 @@
 	</div>
 	
 	<script>
+
+    /////////////////////////////โค้ดใหม่//////////////////////////////////////////////////
+    let materialData = []; // <<== แทนที่ array ตัวอย่าง
+
+function fetchMaterialData() {
+  fetch('https://script.google.com/macros/s/AKfycbw6mZkoxMsNdZq9crhSkpb_JmTywUox1H7SPTJKqBxxjEHk1GPkNlUpaw9FfPpc5uPxKA/exec')
+    .then(response => response.json())
+    .then(data => {
+      materialData = data;
+      populateLowStockTable();
+    })
+    .catch(() => {
+      showModal('ไม่สามารถโหลดรายการวัสดุจาก Google Sheets ได้');
+    });
+}
+
+
+    /////////////////////////คือโค้ดเดิมก่อนแก้ไข///////////////////////////////////////////////////
 	// Sample data for demonstration - this would be replaced with actual data from Google Sheets
-	const materialData = [
+	/*const materialData = [
 	{ materialCode: "M001", materialName: "กระดาษ A4", stockQuantity: 8 },
 	{ materialCode: "M002", materialName: "ปากกาลูกลื่น", stockQuantity: 15 },
 	{ materialCode: "M003", materialName: "ดินสอ 2B", stockQuantity: 5 },
@@ -222,7 +240,7 @@
 	{ materialCode: "M019", materialName: "ไม้บรรทัด", stockQuantity: 7 },
 	{ materialCode: "M020", materialName: "น้ำยาลบคำผิด", stockQuantity: 2 }
 	];
-	
+	*/
 	// Sample recent transactions
 	const recentTransactions = [];
 	
@@ -243,7 +261,10 @@
 	const recentTransactionsTable = document.getElementById('recentTransactionsTable');
 	const currentDateElement = document.getElementById('currentDate');
 	
-	let currentMaterial = null;
+   fetchMaterialData(); // <<== เพิ่มบรรทัดนี้ตรงนี้
+  populateRecentTransactionsTable();
+	
+  let currentMaterial = null;
 	
 	// Set current date
 	const today = new Date();
