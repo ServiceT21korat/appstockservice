@@ -261,10 +261,11 @@ function fetchMaterialData() {
 	const recentTransactionsTable = document.getElementById('recentTransactionsTable');
 	const currentDateElement = document.getElementById('currentDate');
 	
-   fetchMaterialData(); // <<== เพิ่มบรรทัดนี้ตรงนี้
+  let currentMaterial = null;
+   
+  fetchMaterialData(); // <<== เพิ่มบรรทัดนี้ตรงนี้
   populateRecentTransactionsTable();
 	
-  let currentMaterial = null;
 	
 	// Set current date
 	const today = new Date();
@@ -460,8 +461,7 @@ function submitToGoogleSheets(formData) {
 }
 ///////////////////////////////////////////////////////
 
-		
-	function submitToGoogleSheets(formData) {
+		function submitToGoogleSheets(formData) {
 	showLoading('กำลังบันทึกข้อมูล...');
 	
 	// In a real implementation, this would be an actual fetch to the Google Apps Script
