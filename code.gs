@@ -1,5 +1,22 @@
 // Code.gs - Google Apps Script for Material Requisition System
+/////////////////ส่วนที่เพิ่มใหม่3/6/68//////////////////////////
+function doGet(e) {
+  // เปลี่ยนชื่อชีทตรงนี้ถ้าไม่ใช่ Sheet1
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Inventory'); 
+  var data = sheet.getDataRange().getValues();
 
+  var result = [];
+  // data[0] คือ header ข้ามไป เริ่มที่ i=1
+  for (var i = 1; i < data.length; i++) {
+    result.push({
+      materialCode: data[i][0],    // สมมติคอลัมน์ A คือรหัส
+      materialName: data[i][1],    // สมมติคอลัมน์ B คือชื่อ
+      stockQuantity: data[i][2]    // สมมติคอลัมน์ C คือจำนวนคงเหลือ
+    });
+  }
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+///////////////////////////////////////////////////////////
 // Set up web app to handle POST requests from the form
 function doPost(e) {
   try {
@@ -70,7 +87,7 @@ function updateInventory(materialCode, newQuantity) {
     for (let i = 1; i < data.length; i++) {  // Start from 1 to skip header row
       if (data[i][0] === materialCode) {  // Assuming material code is in column A (index 0)
         // Update the stock quantity (assuming it's in column C (index 2))
-        inventorySheet.getRange(i + 1, 3).setValue(newQuantity);
+        inventorySheet.getRange(i + 1, 2).setValue(newQuantity);
         break;
       }
     }
@@ -191,7 +208,7 @@ function getRecentTransactions() {
     transactions.push(transaction);
     
     // Only return the 5 most recent transactions
-    if (transactions.length >= 5) break;
+    if (transactions.length >= 8) break;
   }
   
   return transactions;
