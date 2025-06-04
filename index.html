@@ -179,7 +179,7 @@
 	<!-- Footer -->
 	<footer class="bg-blue-800 text-white py-4 mt-8">
 	<div class="container mx-auto px-4 text-center text-sm">
-	<p>© 2023 ระบบเบิกวัสดุ - พัฒนาโดย Canva Code</p>
+	<p>© 2025 ระบบเบิกวัสดุ - พัฒนาโดย คณาพจน์ ช่างเทคนิค แผนกซ่อมบำรุง Code</p>
 	</div>
 	</footer>
 	</div>
@@ -454,7 +454,7 @@ function submitToGoogleSheets(formData) {
 		/*
 	function submitToGoogleSheets(formData) {
 	showLoading('กำลังบันทึกข้อมูล...');
-	
+	*/
 	// In a real implementation, this would be an actual fetch to the Google Apps Script
 	// For demo purposes, we'll simulate the API call
 	setTimeout(() => {
@@ -475,8 +475,8 @@ function submitToGoogleSheets(formData) {
 	populateRecentTransactionsTable(); // Refresh recent transactions
 	}
 	
-	showModal('บันทึกข้อมูลการเบิกวัสดุเรียบร้อยแล้ว', true);
-	*/
+	//showModal('บันทึกข้อมูลการเบิกวัสดุเรียบร้อยแล้ว', true);
+	
 	// Reset form
 	requisitionForm.reset();
 	currentMaterial = null;
@@ -583,7 +583,7 @@ function submitToGoogleSheets(formData) {
 	});
 	
 	//// Initialize the page
-	//populateLowStockTable();
+	populateLowStockTable();
 //populateRecentTransactionsTable();
 fetchMaterialData(); // โหลดข้อมูลจาก Google Sheets
 populateRecentTransactionsTable();
