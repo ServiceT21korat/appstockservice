@@ -103,7 +103,7 @@
     <!-- Footer -->
     <footer class="bg-blue-800 text-white py-4 mt-8">
       <div class="container mx-auto px-4 text-center text-sm">
-        <p>© 2025 ระบบเบิกวัสดุ - พัฒนาโดย Canva Code</p>
+        <p>© 2025 ระบบเบิกวัสดุ - พัฒนาโดย คณาพจน์ ผ่ายวิศวกรรมอาคาร แผนก ซ่อมบำรุง ตำแหน่ง ช่างเทคนิค </p>
       </div>
     </footer>
   </div>
@@ -144,7 +144,7 @@
       lowStockTable.innerHTML = '';
       const lowStockItems = materialData.filter(item => item.stockQuantity <= 10)
         .sort((a, b) => a.stockQuantity - b.stockQuantity)
-        .slice(0, 5);
+        .slice(0, 7);
       if (lowStockItems.length === 0) {
         lowStockTable.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">ไม่พบวัสดุที่มีจำนวนคงเหลือน้อย</td></tr>';
         return;
