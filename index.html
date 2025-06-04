@@ -230,6 +230,7 @@
     .then(data => {
       materialData = data;
       populateLowStockTable(); // โหลดตารางวัสดุคงเหลือน้อย
+    	fetchMaterialData(); // โหลดข้อมูลจาก Google Sheets
     })
     .catch(() => {
       showModal('ไม่สามารถโหลดรายการวัสดุจาก Google Sheets ได้');
@@ -439,8 +440,9 @@ function submitToGoogleSheets(formData) {
       currentMaterial = null;
       submitBtn.disabled = true;
       submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-      populateLowStockTable();
-      populateRecentTransactionsTable();
+	populateLowStockTable();
+	    fetchMaterialData(); // โหลดข้อมูลจาก Google Sheets
+        populateRecentTransactionsTable();
     } else {
       showModal('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + data.error);
     }
@@ -470,7 +472,7 @@ function submitToGoogleSheets(formData) {
 	materialName: currentMaterial.materialName,
 	requestQuantity: requestQty
 	});
-	
+	fetchMaterialData(); // โหลดข้อมูลจาก Google Sheets
 	populateLowStockTable(); // Refresh the low stock table
 	populateRecentTransactionsTable(); // Refresh recent transactions
 	}
@@ -505,7 +507,7 @@ function submitToGoogleSheets(formData) {
 	materialName: currentMaterial.materialName,
 	requestQuantity: requestQty
 	});
-	
+	fetchMaterialData(); // โหลดข้อมูลจาก Google Sheets
 	populateLowStockTable();
 	populateRecentTransactionsTable();
 	}
