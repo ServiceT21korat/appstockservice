@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบเบิกวัสดุ</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- เพิ่ม library สำหรับสแกน QR Code -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
     body { font-family: 'Prompt', sans-serif; }
@@ -55,18 +57,22 @@
       </div>
 
       <!-- Requisition Form -->
-      <div class="bg-white rounded-xl shadow-md p-6 fade-in">
-        <h2 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+      <div class="bg-white rounded-xl shadow-md px-6 fade-in">
+        <h2 class="text-xl font-semibold text-blue-800 mb-4 flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2z" /></svg>
           เบิกวัสดุ
         </h2>
         <form id="requisitionForm" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label for="materialCode" class="block text-sm font-medium text-gray-700 mb-1">รหัสวัสดุ</label>
+              <label for="materialCode" class="block text-xl font-medium text-gray-700 mb-1">รหัสวัสดุ</label>
               <div class="relative">
-                <input type="text" id="materialCode" name="materialCode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="กรอกรหัสวัสดุ">
-                <button type="button" id="searchBtn" class="absolute right-2 top-2 text-blue-600 hover:text-blue-800">
+                <!-- ปุ่มสแกน QR Code -->
+                <button type="button" id="scanQrBtn" class="absolute left-1/2 top-1 bg-green-100 text-green-700 px-3 py-1 rounded-full hover:bg-green-200 transition duration-300">สแกน QR</button>
+                <input type="text" id="materialCode" name="materialCode" class="w-50 h-50 px-4 py-2 pl-170 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="กรอกรหัสวัสดุ">
+                <!-- div สำหรับ QR reader -->
+                <div id="qr-reader" style="width:500px; display:none; z-index:200; position:absolute; left:100; top:40px;"></div>
+                <button type="button" id="searchBtn" class="absolute right-800 top-2 text-blue-800 hover:text-blue-800">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </button>
               </div>
@@ -90,6 +96,11 @@
               <input type="number" id="remainingQuantity" name="remainingQuantity" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50" readonly>
             </div>
           </div>
+          <!-- ช่องกรอกเลขที่ใบงาน (Optional) -->
+          <div>
+            <label for="jobNumber" class="block text-sm font-medium text-gray-700 mb-1">เลขที่ใบงาน (ถ้ามี)</label>
+            <input type="text" id="jobNumber" name="jobNumber" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="กรอกเลขที่ใบงาน (ไม่บังคับ)">
+          </div>
           <div class="pt-2">
             <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center" disabled>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
@@ -103,7 +114,7 @@
     <!-- Footer -->
     <footer class="bg-blue-800 text-white py-4 mt-8">
       <div class="container mx-auto px-4 text-center text-sm">
-        <p>© 2025 ระบบเบิกวัสดุ - พัฒนาโดย คณาพจน์ ผ่ายวิศวกรรมอาคาร แผนก ซ่อมบำรุง ตำแหน่ง ช่างเทคนิค </p>
+        <p>© 2025 ระบบเบิกวัสดุ - พัฒนาโดย คณาพจน์ ผ่ายวิศวกรรมอาคาร แผนก ซ่อมบำรุง</p>
       </div>
     </footer>
   </div>
@@ -120,9 +131,8 @@
 
   <script>
     let materialData = [];
-    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6mZkoxMsNdZq9crhSkpb_JmTywUox1H7SPTJKqBxxjEHk1GPkNlUpaw9FfPpc5uPxKA/exec"; // <-- ใส่ Script URL
+    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6mZkoxMsNdZq9crhSkpb_JmTywUox1H7SPTJKqBxxjEHk1GPkNlUpaw9FfPpc5uPxKA/exec"; // <--- เปลี่ยนเป็น Script URL ของคุณ
 
-    // โหลดรายการวัสดุ
     function fetchMaterialData() {
       fetch(APP_SCRIPT_URL)
         .then(res => res.json())
@@ -138,7 +148,6 @@
         });
     }
 
-    // ตารางวัสดุคงเหลือน้อย
     function populateLowStockTable() {
       const lowStockTable = document.getElementById('lowStockTable');
       lowStockTable.innerHTML = '';
@@ -172,7 +181,6 @@
       });
     }
 
-    // ค้นหาวัสดุ
     function searchMaterial(code) {
       const material = materialData.find(item => item.materialCode === code);
       const materialNameInput = document.getElementById('materialName');
@@ -268,7 +276,7 @@
           window.currentMaterial = null;
           document.getElementById('submitBtn').disabled = true;
           document.getElementById('submitBtn').classList.add('opacity-50', 'cursor-not-allowed');
-          fetchMaterialData(); // รีโหลดข้อมูลล่าสุด
+          fetchMaterialData();
         } else {
           showModal('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + data.error);
         }
@@ -279,7 +287,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      // Set current date in Thai
       const currentDateElement = document.getElementById('currentDate');
       const today = new Date();
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -287,12 +294,13 @@
 
       fetchMaterialData();
 
-      // Form handlers
       const searchBtn = document.getElementById('searchBtn');
       const materialCodeInput = document.getElementById('materialCode');
       const requestQuantityInput = document.getElementById('requestQuantity');
       const requisitionForm = document.getElementById('requisitionForm');
       const closeModalBtn = document.getElementById('closeModalBtn');
+      const scanQrBtn = document.getElementById('scanQrBtn');
+      const qrReaderDiv = document.getElementById('qr-reader');
 
       searchBtn.addEventListener('click', function() {
         const code = materialCodeInput.value.trim();
@@ -326,18 +334,40 @@
           showModal('จำนวนที่เบิกมากกว่าจำนวนในสต๊อก');
           return;
         }
-        // เตรียมข้อมูลส่งไป Google Sheets
         const formData = new FormData();
         formData.append('materialCode', window.currentMaterial.materialCode);
         formData.append('materialName', window.currentMaterial.materialName);
         formData.append('stockQuantity', window.currentMaterial.stockQuantity);
         formData.append('requestQuantity', requestQty);
         formData.append('remainingQuantity', parseInt(document.getElementById('remainingQuantity').value));
+        // เพิ่มช่องใบงาน (optional)
+        formData.append('jobNumber', document.getElementById('jobNumber').value || '');
         submitToGoogleSheets(formData);
       });
 
       closeModalBtn.addEventListener('click', function() {
         document.getElementById('modal').classList.add('hidden');
+      });
+
+      // ฟีเจอร์สแกน QR Code
+      let qrCodeScanner;
+      scanQrBtn.addEventListener('click', function() {
+        qrReaderDiv.style.display = 'block';
+        if (!qrCodeScanner) {
+          qrCodeScanner = new Html5Qrcode("qr-reader");
+        }
+        qrCodeScanner.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: 200 },
+          decodedText => {
+            materialCodeInput.value = decodedText;
+            qrCodeScanner.stop().then(() => {
+              qrReaderDiv.style.display = 'none';
+              searchMaterial(decodedText);
+            });
+          },
+          errorMessage => { /* ignore error */ }
+        );
       });
     });
   </script>
