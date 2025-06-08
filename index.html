@@ -17,11 +17,11 @@
 <body class="bg-gray-50">
   <div class="min-h-screen flex flex-col">
     <!-- Header -->
-    <header class="bg-blue-700 text-white shadow-lg">
+    <header class="bg-blue-800 text-white shadow-xl">
       <div class="container mx-auto px-4 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0v10l-8 4m-8-4V7m8 4v10M4 7v10l8 4" /></svg>
-          <h1 class="text-xl md:text-2xl font-bold">ระบบเบิกวัสดุ</h1>
+          <h1 class="text-lg md:text-1xl font-bold">ระบบเบิกวัสดุ</h1>
         </div>
         <div class="flex items-center">
           <span id="currentDate" class="text-sm md:text-base"></span>
@@ -35,8 +35,7 @@
       <div class="mb-8 bg-white rounded-xl shadow-md p-6 fade-in">
         <h2 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-          วัสดุที่มีจำนวนคงเหลือน้อย (≤ 10)
-        </h2>
+          วัสดุที่มีจำนวนคงเหลือน้อย </h2>
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-blue-50">
@@ -63,17 +62,17 @@
           เบิกวัสดุ
         </h2>
         <form id="requisitionForm" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-80 md:grid-cols-2 gap-4">
             <div>
               <label for="materialCode" class="block text-xl font-medium text-gray-700 mb-1">รหัสวัสดุ</label>
               <div class="relative">
                 <!-- ปุ่มสแกน QR Code -->
-                <button type="button" id="scanQrBtn" class="absolute left-1/2 top-1 bg-green-100 text-green-700 px-3 py-1 rounded-full hover:bg-green-200 transition duration-300">สแกน QR</button>
-                <input type="text" id="materialCode" name="materialCode" class="w-50 h-50 px-4 py-2 pl-170 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="กรอกรหัสวัสดุ">
-                <!-- div สำหรับ QR reader -->
-                <div id="qr-reader" style="width:500px; display:none; z-index:200; position:absolute; left:100; top:40px;"></div>
-                <button type="button" id="searchBtn" class="absolute right-800 top-2 text-blue-800 hover:text-blue-800">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+               <button type="button" id="scanQrBtn" class="absolute right-90 left-1/2 top-1 bg-blue-800 text-white px-2 py-3 rounded-full hover:bg-green-800 transition duration-300">สแกน QR</button>
+                <input type="text" id="materialCode" name="materialCode" class="w-44 h-30 px-4 py-2 pl-500 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="กรอกรหัสวัสดุ">
+                 <!-- div สำหรับ QR reader -->
+                <div id="qr-reader" style="width: 5px; display:none; z-index:20; position:absolute; left:100; top:200px;"></div>
+                <button type="button" id="searchBtn" class="absolute right-90 top-1 text-blue-700 hover:text-blue-800">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 20 20" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </button>
               </div>
             </div>
