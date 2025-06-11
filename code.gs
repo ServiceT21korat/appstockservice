@@ -1,5 +1,5 @@
 function doGet(e) {
-  var ss = SpreadsheetApp.openById('14XwCMLNYYllVSRdl1jqzU48H2ilFbAFgFuhbtuKHLbc'); // ← ใส่ Spreadsheet ID จริง
+  var ss = SpreadsheetApp.openById('YOUR_SPREADSHEET_ID'); // <--- ใส่ Spreadsheet ID ของคุณ
   var sheet = ss.getSheetByName('Inventory');
   var data = sheet.getDataRange().getValues();
   var result = [];
@@ -16,11 +16,11 @@ function doGet(e) {
 
 function doPost(e) {
   try {
-    var ss = SpreadsheetApp.openById('14XwCMLNYYllVSRdl1jqzU48H2ilFbAFgFuhbtuKHLbc'); // ← ใส่ Spreadsheet ID จริง
+    var ss = SpreadsheetApp.openById('YOUR_SPREADSHEET_ID'); // <--- ใส่ Spreadsheet ID ของคุณ
     var inventorySheet = ss.getSheetByName('Inventory');
     var logSheet = ss.getSheetByName('StockData') || ss.insertSheet('StockData');
 
-    // รับข้อมูลจาก Form
+    // รับข้อมูลจากฟอร์ม
     var code = e.parameter.materialCode;
     var name = e.parameter.materialName;
     var stockQty = Number(e.parameter.stockQuantity);
